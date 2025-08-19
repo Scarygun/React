@@ -1,8 +1,0 @@
-![](/3-dars//images/1.png)
-![](/3-dars//images/2.png)
-![](/3-dars//images/3.png)
-![](/3-dars//images/4.png)
-![](/3-dars/images/5.png)
-![](/3-dars//images/6.png)
-![](/3-dars//images/7.png)
-![](/3-dars//images/8.png)
