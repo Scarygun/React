@@ -26,6 +26,13 @@ const mockUsers: User[] = [
   { id: "2", username: "waiter1", role: "waiter", name: "Ofitsiant 1" },
   { id: "3", username: "waiter2", role: "waiter", name: "Ofitsiant 2" },
   { id: "4", username: "manager", role: "manager", name: "Menejer" },
+  {
+    id: "5",
+    username: "chef.test",
+    password: "password",
+    role: "chef",
+    name: "Oshpazbek",
+  },
 ]
 
 const mockPasswords: Record<string, string> = {
@@ -36,7 +43,15 @@ const mockPasswords: Record<string, string> = {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window !== "undefined") {
+      const savedUser = localStorage.getItem("restaurant-user")
+      if (savedUser) {
+        return JSON.parse(savedUser)
+      }
+    }
+    return null
+  })
 
   useEffect(() => {
     // Check for saved user in localStorage

@@ -87,4 +87,11 @@
   body {
     @apply bg-background text-foreground;
   }
+  .restaurant-bg {
+    background-image: url('/placeholder.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-blend-mode: overlay;
+  }
 }

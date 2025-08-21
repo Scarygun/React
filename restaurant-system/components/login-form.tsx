@@ -32,10 +32,10 @@ export function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center">
+      <Card className="w-full max-w-md shadow-lg rounded-lg">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Restoran Tizimiga Kirish</CardTitle>
+          <CardTitle className="text-3xl font-extrabold">Restoran Tizimiga Kirish</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

@@ -7,23 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Download, TrendingUp, DollarSign, ShoppingCart, Clock } from "lucide-react"
-
-interface Order {
-  id: string
-  tableId: string
-  items: { menuItemId: string; quantity: number }[]
-  totalPrice: number
-  status: "active" | "completed"
-  createdAt: Date
-}
-
-interface MenuItem {
-  id: string
-  name: string
-  category: "Taomlar" | "Salatlar" | "Ichimliklar"
-  price: number
-  stock: number
-}
+import { Order, MenuItem } from "@/types"
 
 interface ReportsManagementProps {
   orders: Order[]
@@ -144,17 +128,17 @@ export function ReportsManagement({ orders, menu }: ReportsManagementProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 rounded-lg bg-card shadow-sm gap-4">
         <div>
           <h2 className="text-2xl font-bold">Hisobotlar</h2>
-          <p className="text-gray-600">Avtomatik yaratilgan sotuv hisobotlari</p>
+          <p className="text-muted-foreground">Avtomatik yaratilgan sotuv hisobotlari</p>
         </div>
         <div className="flex gap-4">
           <Select
             value={selectedPeriod}
             onValueChange={(value: "today" | "week" | "month") => setSelectedPeriod(value)}
           >
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-full sm:w-40 text-base py-2">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -163,8 +147,8 @@ export function ReportsManagement({ orders, menu }: ReportsManagementProps) {
               <SelectItem value="month">Bu oy</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={exportReport} className="flex items-center gap-2">
-            <Download className="h-4 w-4" />
+          <Button onClick={exportReport} className="flex items-center gap-2 text-base py-2 px-4">
+            <Download className="h-5 w-5" />
             Eksport
           </Button>
         </div>
@@ -172,75 +156,75 @@ export function ReportsManagement({ orders, menu }: ReportsManagementProps) {
 
       {/* Key Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
+        <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Umumiy daromad</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Umumiy daromad</CardTitle>
+            <DollarSign className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalRevenue.toLocaleString()} so'm</div>
+            <div className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.totalRevenue.toLocaleString()} so'm</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Buyurtmalar soni</CardTitle>
-            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Buyurtmalar soni</CardTitle>
+            <ShoppingCart className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalOrders}</div>
+            <div className="text-3xl font-bold">{stats.totalOrders}</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">O'rtacha buyurtma</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">O'rtacha buyurtma</CardTitle>
+            <TrendingUp className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{Math.round(stats.averageOrderValue).toLocaleString()} so'm</div>
+            <div className="text-3xl font-bold">{Math.round(stats.averageOrderValue).toLocaleString()} so'm</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Faol buyurtmalar</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Faol buyurtmalar</CardTitle>
+            <Clock className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.activeOrders}</div>
+            <div className="text-3xl font-bold">{stats.activeOrders}</div>
           </CardContent>
         </Card>
       </div>
 
       <Tabs defaultValue="popular" className="w-full">
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-4 h-auto p-1 bg-muted rounded-md">
           <TabsTrigger value="popular">Mashhur taomlar</TabsTrigger>
           <TabsTrigger value="category">Kategoriya bo'yicha</TabsTrigger>
           <TabsTrigger value="hourly">Soatlik sotuv</TabsTrigger>
           <TabsTrigger value="orders">Buyurtmalar ro'yxati</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="popular" className="space-y-4">
+        <TabsContent value="popular" className="space-y-4 mt-4">
           <Card>
             <CardHeader>
               <CardTitle>Eng ko'p sotilgan taomlar</CardTitle>
-              <CardDescription>Tanlangan davr bo'yicha eng mashhur taomlar</CardDescription>
+              <CardDescription className="text-muted-foreground">Tanlangan davr bo'yicha eng mashhur taomlar</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {stats.popularItems.map((item, index) => (
-                  <div key={item.item?.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div key={item.item?.id} className="flex items-center justify-between p-3 border rounded-lg bg-background hover:bg-muted/50 transition-colors">
                     <div className="flex items-center gap-3">
-                      <Badge variant="secondary">{index + 1}</Badge>
+                      <Badge variant="secondary" className="font-semibold text-base">{index + 1}</Badge>
                       <div>
-                        <p className="font-medium">{item.item?.name}</p>
-                        <p className="text-sm text-gray-600">{item.item?.category}</p>
+                        <p className="font-medium text-base">{item.item?.name}</p>
+                        <p className="text-sm text-muted-foreground">{item.item?.category}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold">{item.count} dona</p>
-                      <p className="text-sm text-gray-600">
+                      <p className="font-bold text-base">{item.count} dona</p>
+                      <p className="text-sm text-muted-foreground">
                         {((item.item?.price || 0) * item.count).toLocaleString()} so'm
                       </p>
                     </div>
@@ -251,20 +235,20 @@ export function ReportsManagement({ orders, menu }: ReportsManagementProps) {
           </Card>
         </TabsContent>
 
-        <TabsContent value="category" className="space-y-4">
+        <TabsContent value="category" className="space-y-4 mt-4">
           <Card>
             <CardHeader>
               <CardTitle>Kategoriya bo'yicha daromad</CardTitle>
-              <CardDescription>Har bir kategoriyadan olingan daromad</CardDescription>
+              <CardDescription className="text-muted-foreground">Har bir kategoriyadan olingan daromad</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {Object.entries(stats.categoryRevenue).map(([category, revenue]) => (
-                  <div key={category} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="font-medium">{category}</div>
+                  <div key={category} className="flex items-center justify-between p-3 border rounded-lg bg-background hover:bg-muted/50 transition-colors">
+                    <div className="font-medium text-base">{category}</div>
                     <div className="text-right">
-                      <p className="font-bold">{revenue.toLocaleString()} so'm</p>
-                      <p className="text-sm text-gray-600">
+                      <p className="font-bold text-base">{revenue.toLocaleString()} so'm</p>
+                      <p className="text-sm text-muted-foreground">
                         {stats.totalRevenue > 0 ? Math.round((revenue / stats.totalRevenue) * 100) : 0}%
                       </p>
                     </div>
@@ -275,18 +259,18 @@ export function ReportsManagement({ orders, menu }: ReportsManagementProps) {
           </Card>
         </TabsContent>
 
-        <TabsContent value="hourly" className="space-y-4">
+        <TabsContent value="hourly" className="space-y-4 mt-4">
           {selectedPeriod === "today" ? (
             <Card>
               <CardHeader>
                 <CardTitle>Soatlik sotuv ma'lumotlari</CardTitle>
-                <CardDescription>Bugungi kun davomida soatlik daromad</CardDescription>
+                <CardDescription className="text-muted-foreground">Bugungi kun davomida soatlik daromad</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-6 gap-2">
                   {hourlySales.map((data) => (
-                    <div key={data.hour} className="text-center p-2 border rounded">
-                      <p className="text-xs font-medium">{data.hour}</p>
+                    <div key={data.hour} className="text-center p-3 border rounded-lg bg-background hover:bg-muted/50 transition-colors">
+                      <p className="text-xs font-medium text-muted-foreground">{data.hour}</p>
                       <p className="text-sm font-bold">{data.revenue.toLocaleString()}</p>
                     </div>
                   ))}
@@ -294,33 +278,33 @@ export function ReportsManagement({ orders, menu }: ReportsManagementProps) {
               </CardContent>
             </Card>
           ) : (
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-center text-gray-600">Soatlik ma'lumotlar faqat "Bugun" uchun mavjud</p>
+            <Card className="shadow-sm">
+              <CardContent className="pt-6 text-center text-muted-foreground">
+                <p>Soatlik ma'lumotlar faqat "Bugun" uchun mavjud</p>
               </CardContent>
             </Card>
           )}
         </TabsContent>
 
-        <TabsContent value="orders" className="space-y-4">
+        <TabsContent value="orders" className="space-y-4 mt-4">
           <Card>
             <CardHeader>
               <CardTitle>Buyurtmalar ro'yxati</CardTitle>
-              <CardDescription>Tanlangan davr bo'yicha barcha buyurtmalar</CardDescription>
+              <CardDescription className="text-muted-foreground">Tanlangan davr bo'yicha barcha buyurtmalar</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2 max-h-96 overflow-y-auto">
+              <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
                 {filteredOrders.map((order) => (
-                  <div key={order.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div key={order.id} className="flex items-center justify-between p-3 border rounded-lg bg-background hover:bg-muted/50 transition-colors">
                     <div>
-                      <p className="font-medium">Buyurtma #{order.id}</p>
-                      <p className="text-sm text-gray-600">
-                        Stol: {order.tableId} | {order.createdAt.toLocaleString()}
+                      <p className="font-medium text-base">Buyurtma #{order.id.slice(-6)}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Stol: {order.tableId} | {new Date(order.createdAt).toLocaleString()}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold">{order.totalPrice.toLocaleString()} so'm</p>
-                      <Badge variant={order.status === "completed" ? "default" : "secondary"}>
+                      <p className="font-bold text-base">{order.totalPrice.toLocaleString()} so'm</p>
+                      <Badge variant={order.status === "completed" ? "default" : "secondary"} className="font-semibold">
                         {order.status === "completed" ? "Tugallangan" : "Faol"}
                       </Badge>
                     </div>

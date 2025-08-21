@@ -11,44 +11,11 @@ import { MenuManagement } from "@/components/menu-management"
 import { AdminDashboard } from "@/components/admin-dashboard"
 import { useBusinessLogic } from "@/hooks/use-business-logic"
 import { ReportsManagement } from "@/components/reports-management"
-
-// Data types
-interface MenuItem {
-  id: string
-  name: string
-  category: "Taomlar" | "Salatlar" | "Ichimliklar"
-  price: number
-  stock: number
-  description?: string
-  isActive: boolean
-}
-
-interface OrderItem {
-  menuItemId: string
-  quantity: number
-}
-
-interface Order {
-  id: string
-  tableId: string
-  items: OrderItem[]
-  totalPrice: number
-  status: "active" | "completed"
-  createdAt: Date
-}
-
-interface Table {
-  id: string
-  name: string
-  status: "Bo'sh" | "Band" | "Tozalanmoqda" | "Rezerv"
-  orders: string[]
-  totalAmount: number
-  capacity: number
-  assignedWaiter?: string
-  occupiedSince?: Date
-  reservedBy?: string
-  reservedTime?: Date
-}
+import { ThemeToggle } from "@/components/theme-toggle"
+import { Sidebar } from "@/components/sidebar"
+import { ChefDashboard } from "@/components/chef-dashboard"
+import { MenuItem, Order, Table } from "@/types"
+import { UserRole } from "@/types"
 
 // Mock data
 const initialMenu: MenuItem[] = [
@@ -126,26 +93,32 @@ export default function RestaurantManagement() {
   const [orders, setOrders] = useState<Order[]>([])
   const [menu, setMenu] = useState<MenuItem[]>(initialMenu)
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
+  const [currentTab, setCurrentTab] = useState("tables")
   const { user, logout, isAuthenticated } = useAuth()
 
   const { generateStockAlerts } = useBusinessLogic()
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      // Generate stock alerts and log them
-      const alerts = generateStockAlerts(menu)
-      if (alerts.criticalAlerts.length > 0) {
-        console.log("[v0] Critical stock alerts:", alerts.criticalAlerts)
-      }
-    }, 30000) // Check every 30 seconds
+    const savedTables = localStorage.getItem("restaurant-tables")
+    const savedOrders = localStorage.getItem("restaurant-orders")
+    const savedMenu = localStorage.getItem("restaurant-menu")
 
-    return () => clearInterval(interval)
-  }, [menu, generateStockAlerts])
+    if (savedTables) setTables(JSON.parse(savedTables))
+    if (savedOrders) setOrders(JSON.parse(savedOrders))
+    if (savedMenu) setMenu(JSON.parse(savedMenu))
+  }, [])
 
-  // Show login form if not authenticated
-  if (!isAuthenticated) {
-    return <LoginForm />
-  }
+  useEffect(() => {
+    localStorage.setItem("restaurant-tables", JSON.stringify(tables))
+  }, [tables])
+
+  useEffect(() => {
+    localStorage.setItem("restaurant-orders", JSON.stringify(orders))
+  }, [orders])
+
+  useEffect(() => {
+    localStorage.setItem("restaurant-menu", JSON.stringify(menu))
+  }, [menu])
 
   const getStatusColor = (status: Table["status"]) => {
     switch (status) {
@@ -166,61 +139,100 @@ export default function RestaurantManagement() {
     setTables((prev) => prev.map((table) => (table.id === tableId ? { ...table, status } : table)))
   }
 
+  const handleBackupData = () => {
+    const backupData = {
+      tables,
+      orders,
+      menu,
+      timestamp: new Date().toISOString(),
+      version: "1.0",
+    }
+
+    const dataStr = JSON.stringify(backupData, null, 2)
+    const dataBlob = new Blob([dataStr], { type: "application/json" })
+    const url = URL.createObjectURL(dataBlob)
+
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `restaurant-backup-${new Date().toISOString().split("T")[0]}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
+  const handleRestoreData = (data: any) => {
+    if (data.tables) setTables(data.tables)
+    if (data.orders) setOrders(data.orders)
+    if (data.menu) setMenu(data.menu)
+    alert("Ma'lumotlar muvaffaqiyatli tiklandi!")
+  }
+
+  const getOrderCount = () => {
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const weekStart = new Date(today.getTime() - today.getDay() * 24 * 60 * 60 * 1000)
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+
+    return {
+      today: orders.filter((order) => new Date(order.createdAt) >= today).length,
+      week: orders.filter((order) => new Date(order.createdAt) >= weekStart).length,
+      month: orders.filter((order) => new Date(order.createdAt) >= monthStart).length,
+    }
+  }
+
+  if (!isAuthenticated) {
+    return <LoginForm />
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="p-4">
+      <div className="mx-auto rounded-lg shadow-xl p-6 bg-background/80 backdrop-blur-md">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Restoran Boshqaruv Tizimi</h1>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="font-semibold">{user?.name}</p>
-              <p className="text-sm text-gray-600 capitalize">{user?.role}</p>
-            </div>
-            <Button variant="outline" onClick={logout}>
-              Chiqish
-            </Button>
-          </div>
+          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl text-gray-900 dark:text-gray-50">Restoran Boshqaruv Tizimi</h1>
+          {/* Removed user info and logout button as they are now in the sidebar */}
         </div>
 
-        <Tabs defaultValue="tables" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="tables">Stollar</TabsTrigger>
-            <TabsTrigger value="orders">Buyurtmalar</TabsTrigger>
-            <TabsTrigger value="menu">Menyu</TabsTrigger>
-            <TabsTrigger value="reports">Hisobotlar</TabsTrigger>
-            {(user?.role === "admin" || user?.role === "manager") && <TabsTrigger value="admin">Admin</TabsTrigger>}
-          </TabsList>
-
-          <TabsContent value="tables" className="space-y-4">
-            <TableManagement tables={tables} setTables={setTables} userRole={user?.role || ""} />
-          </TabsContent>
-
-          <TabsContent value="orders" className="space-y-4">
-            <OrderManagement
-              orders={orders}
-              setOrders={setOrders}
-              tables={tables}
-              setTables={setTables}
-              menu={menu}
-              setMenu={setMenu}
-              userRole={user?.role || ""}
-              userName={user?.name || ""}
-            />
-          </TabsContent>
-
-          <TabsContent value="menu" className="space-y-4">
-            <MenuManagement menu={menu} setMenu={setMenu} userRole={user?.role || ""} />
-          </TabsContent>
-
-          <TabsContent value="reports" className="space-y-4">
-            <ReportsManagement orders={orders} menu={menu} />
-          </TabsContent>
-
-          {(user?.role === "admin" || user?.role === "manager") && (
-            <TabsContent value="admin" className="space-y-4">
-              <AdminDashboard orders={orders} tables={tables} menu={menu} />
+        <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full flex">
+          <Sidebar currentTab={currentTab} onTabChange={setCurrentTab} userRole={user?.role || ""} user={user} logout={logout} />
+          <div className="flex-1 ml-4">
+            <TabsContent value="tables" className="space-y-4">
+              <TableManagement tables={tables} setTables={setTables} userRole={user?.role || ""} />
             </TabsContent>
-          )}
+
+            <TabsContent value="orders" className="space-y-4">
+              <OrderManagement
+                orders={orders}
+                setOrders={setOrders}
+                tables={tables}
+                setTables={setTables}
+                menu={menu}
+                setMenu={setMenu}
+                userRole={user?.role || ""}
+                userName={user?.name || ""}
+              />
+            </TabsContent>
+
+            <TabsContent value="menu" className="space-y-4">
+              <MenuManagement menu={menu} setMenu={setMenu} userRole={user?.role || ""} />
+            </TabsContent>
+
+            <TabsContent value="reports" className="space-y-4">
+              <ReportsManagement orders={orders} menu={menu} />
+            </TabsContent>
+
+            {(user?.role === "admin" || user?.role === "manager") && (
+              <TabsContent value="admin" className="space-y-4">
+                <AdminDashboard orders={orders} tables={tables} menu={menu} />
+              </TabsContent>
+            )}
+
+            {((user?.role === "chef" || user?.role === "admin") as UserRole) && (
+              <TabsContent value="chef" className="space-y-4">
+                <ChefDashboard orders={orders} setOrders={setOrders} menu={menu} tables={tables} chefName={user?.name || ""} />
+              </TabsContent>
+            )}
+          </div>
         </Tabs>
       </div>
     </div>

@@ -11,48 +11,9 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Plus, Minus, ShoppingCart, Clock, CheckCircle, Trash2, AlertTriangle } from "lucide-react"
+import { Plus, Minus, ShoppingCart, Clock, CheckCircle, Trash2, AlertTriangle, DollarSign } from "lucide-react"
 import { useBusinessLogic } from "@/hooks/use-business-logic"
-
-interface MenuItem {
-  id: string
-  name: string
-  category: "Taomlar" | "Salatlar" | "Ichimliklar"
-  price: number
-  stock: number
-  isActive: boolean
-}
-
-interface OrderItem {
-  menuItemId: string
-  quantity: number
-  price: number
-  name: string
-}
-
-interface Order {
-  id: string
-  tableId: string
-  items: OrderItem[]
-  totalPrice: number
-  status: "active" | "completed" | "cancelled"
-  createdAt: Date
-  completedAt?: Date
-  waiterName?: string
-}
-
-interface Table {
-  id: string
-  name: string
-  status: "Bo'sh" | "Band" | "Tozalanmoqda" | "Rezerv"
-  orders: string[]
-  totalAmount: number
-  capacity: number
-  assignedWaiter?: string
-  occupiedSince?: Date
-  reservedBy?: string
-  reservedTime?: Date
-}
+import { MenuItem, Order, OrderItem, Table } from "@/types"
 
 interface OrderManagementProps {
   orders: Order[]
@@ -187,11 +148,11 @@ export function OrderManagement({
   const getStatusColor = (status: Order["status"]) => {
     switch (status) {
       case "active":
-        return "bg-blue-500"
+        return "bg-blue-500 dark:bg-blue-600"
       case "completed":
-        return "bg-green-500"
+        return "bg-green-500 dark:bg-green-600"
       case "cancelled":
-        return "bg-red-500"
+        return "bg-red-500 dark:bg-red-600"
       default:
         return "bg-gray-500"
     }
@@ -218,49 +179,49 @@ export function OrderManagement({
       {stockAlerts.criticalAlerts.length > 0 && (
         <div className="space-y-2">
           {stockAlerts.criticalAlerts.map((alert, index) => (
-            <Alert key={index} variant="destructive">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>{alert}</AlertDescription>
+            <Alert key={index} variant="destructive" className="border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20 dark:border-red-700 text-red-700 dark:text-red-300">
+              <AlertTriangle className="h-5 w-5" />
+              <AlertDescription className="font-medium">{alert}</AlertDescription>
             </Alert>
           ))}
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="p-4">
+        <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Faol buyurtmalar</p>
-                <p className="text-2xl font-bold text-blue-600">{activeOrders.length}</p>
+                <p className="text-sm font-medium text-muted-foreground">Faol buyurtmalar</p>
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{activeOrders.length}</p>
               </div>
-              <ShoppingCart className="w-8 h-8 text-blue-500" />
+              <ShoppingCart className="w-8 h-8 text-blue-500 dark:text-blue-400" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
+        <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Bugun tugallangan</p>
-                <p className="text-2xl font-bold text-green-600">{completedOrders.length}</p>
+                <p className="text-sm font-medium text-muted-foreground">Bugun tugallangan</p>
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">{completedOrders.length}</p>
               </div>
-              <CheckCircle className="w-8 h-8 text-green-500" />
+              <CheckCircle className="w-8 h-8 text-green-500 dark:text-green-400" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
+        <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Bugungi daromad</p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-sm font-medium text-muted-foreground">Bugungi daromad</p>
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {completedOrders.reduce((sum, order) => sum + order.totalPrice, 0).toLocaleString()} so'm
                 </p>
               </div>
-              <div className="text-green-500 text-2xl">₽</div>
+              <DollarSign className="w-8 h-8 text-green-500 dark:text-green-400" />
             </div>
           </CardContent>
         </Card>
@@ -275,17 +236,17 @@ export function OrderManagement({
               Yangi buyurtma
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Yangi buyurtma yaratish</DialogTitle>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto p-6 rounded-lg shadow-xl bg-background">
+            <DialogHeader className="pb-4 mb-4 border-b">
+              <DialogTitle className="text-2xl font-bold">Yangi buyurtma yaratish</DialogTitle>
             </DialogHeader>
 
             {validationErrors.length > 0 && (
               <div className="space-y-2">
                 {validationErrors.map((error, index) => (
-                  <Alert key={index} variant="destructive">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertDescription>{error}</AlertDescription>
+                  <Alert key={index} variant="destructive" className="border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20 dark:border-red-700 text-red-700 dark:text-red-300">
+                    <AlertTriangle className="h-5 w-5" />
+                    <AlertDescription className="font-medium">{error}</AlertDescription>
                   </Alert>
                 ))}
               </div>
@@ -294,9 +255,9 @@ export function OrderManagement({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
-                  <Label>Stol tanlang</Label>
+                  <Label className="text-sm font-medium text-muted-foreground">Stol tanlang</Label>
                   <Select value={selectedTable} onValueChange={setSelectedTable}>
-                    <SelectTrigger>
+                    <SelectTrigger className="mt-1">
                       <SelectValue placeholder="Stol tanlang" />
                     </SelectTrigger>
                     <SelectContent>
@@ -312,19 +273,19 @@ export function OrderManagement({
                 </div>
 
                 <div>
-                  <Label>Menyu</Label>
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                  <Label className="text-sm font-medium text-muted-foreground">Menyu</Label>
+                  <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
                     {["Taomlar", "Salatlar", "Ichimliklar"].map((category) => (
                       <div key={category}>
-                        <h4 className="font-medium text-sm text-gray-700 mb-2">{category}</h4>
+                        <h4 className="font-semibold text-base text-muted-foreground mb-2">{category}</h4>
                         <div className="space-y-2">
                           {menu
                             .filter((item) => item.category === category && item.isActive)
                             .map((item) => (
-                              <div key={item.id} className="flex items-center justify-between p-2 border rounded">
+                              <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg bg-background hover:bg-muted/50 transition-colors">
                                 <div className="flex-1">
-                                  <p className="font-medium text-sm">{item.name}</p>
-                                  <p className="text-xs text-gray-600">
+                                  <p className="font-medium text-base">{item.name}</p>
+                                  <p className="text-xs text-muted-foreground">
                                     {item.price.toLocaleString()} so'm • Zaxira: {item.stock}
                                     {item.stock <= 10 && item.stock > 0 && (
                                       <Badge variant="secondary" className="ml-2">
@@ -338,8 +299,8 @@ export function OrderManagement({
                                     )}
                                   </p>
                                 </div>
-                                <Button size="sm" onClick={() => addItemToOrder(item)} disabled={item.stock === 0}>
-                                  <Plus className="w-3 h-3" />
+                                <Button size="icon" onClick={() => addItemToOrder(item)} disabled={item.stock === 0} className="shrink-0">
+                                  <Plus className="w-4 h-4" />
                                 </Button>
                               </div>
                             ))}
@@ -351,39 +312,42 @@ export function OrderManagement({
               </div>
 
               <div className="space-y-4">
-                <Label>Joriy buyurtma</Label>
-                <Card>
+                <Label className="text-sm font-medium text-muted-foreground">Joriy buyurtma</Label>
+                <Card className="shadow-sm">
                   <CardContent className="p-4">
                     {currentOrder.length === 0 ? (
-                      <p className="text-gray-500 text-center py-4">Buyurtma bo'sh</p>
+                      <p className="text-muted-foreground text-center py-4">Buyurtma bo'sh</p>
                     ) : (
                       <div className="space-y-3">
                         {currentOrder.map((item) => (
-                          <div key={item.menuItemId} className="flex items-center justify-between">
+                          <div key={item.menuItemId} className="flex items-center justify-between p-2 border-b last:border-b-0">
                             <div className="flex-1">
-                              <p className="font-medium text-sm">{item.name}</p>
-                              <p className="text-xs text-gray-600">{item.price.toLocaleString()} so'm</p>
+                              <p className="font-medium text-base">{item.name}</p>
+                              <p className="text-xs text-muted-foreground">{item.price.toLocaleString()} so'm</p>
                             </div>
                             <div className="flex items-center gap-2">
                               <Button
-                                size="sm"
+                                size="icon"
                                 variant="outline"
                                 onClick={() => updateItemQuantity(item.menuItemId, item.quantity - 1)}
+                                className="h-7 w-7"
                               >
                                 <Minus className="w-3 h-3" />
                               </Button>
-                              <span className="w-8 text-center text-sm">{item.quantity}</span>
+                              <span className="w-6 text-center text-sm font-medium">{item.quantity}</span>
                               <Button
-                                size="sm"
+                                size="icon"
                                 variant="outline"
                                 onClick={() => updateItemQuantity(item.menuItemId, item.quantity + 1)}
+                                className="h-7 w-7"
                               >
                                 <Plus className="w-3 h-3" />
                               </Button>
                               <Button
-                                size="sm"
+                                size="icon"
                                 variant="destructive"
                                 onClick={() => updateItemQuantity(item.menuItemId, 0)}
+                                className="h-7 w-7"
                               >
                                 <Trash2 className="w-3 h-3" />
                               </Button>
@@ -391,12 +355,12 @@ export function OrderManagement({
                           </div>
                         ))}
 
-                        <Separator />
+                        <Separator className="my-2" />
 
                         <div className="space-y-2">
-                          <div className="flex justify-between items-center text-sm">
+                          <div className="flex justify-between items-center text-sm text-muted-foreground">
                             <span>Oraliq jami:</span>
-                            <span>
+                            <span className="font-semibold">
                               {currentOrder.reduce((sum, item) => sum + item.price * item.quantity, 0).toLocaleString()}{" "}
                               so'm
                             </span>
@@ -404,9 +368,9 @@ export function OrderManagement({
 
                           {calculateOrderTotal(currentOrder) <
                             currentOrder.reduce((sum, item) => sum + item.price * item.quantity, 0) && (
-                            <div className="flex justify-between items-center text-sm text-green-600">
+                            <div className="flex justify-between items-center text-sm text-green-600 dark:text-green-400">
                               <span>Chegirma:</span>
-                              <span>
+                              <span className="font-semibold">
                                 -
                                 {(
                                   currentOrder.reduce((sum, item) => sum + item.price * item.quantity, 0) -
@@ -417,7 +381,7 @@ export function OrderManagement({
                             </div>
                           )}
 
-                          <div className="flex justify-between items-center font-semibold text-lg border-t pt-2">
+                          <div className="flex justify-between items-center font-bold text-lg border-t pt-2 mt-2">
                             <span>Jami:</span>
                             <span>{calculateOrderTotal(currentOrder).toLocaleString()} so'm</span>
                           </div>
@@ -426,7 +390,7 @@ export function OrderManagement({
                         <Button
                           onClick={createOrder}
                           disabled={!selectedTable || currentOrder.length === 0}
-                          className="w-full"
+                          className="w-full text-lg py-3"
                         >
                           Buyurtma yaratish
                         </Button>
@@ -441,29 +405,29 @@ export function OrderManagement({
       </div>
 
       <div>
-        <h3 className="text-lg font-medium mb-4">Faol buyurtmalar</h3>
+        <h3 className="text-2xl font-bold mb-4">Faol buyurtmalar</h3>
         {activeOrders.length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <p className="text-gray-500">Hozircha faol buyurtmalar yo'q</p>
+          <Card className="shadow-sm">
+            <CardContent className="p-8 text-center text-muted-foreground">
+              <p>Hozircha faol buyurtmalar yo'q</p>
             </CardContent>
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {activeOrders.map((order) => (
-              <Card key={order.id} className="cursor-pointer hover:shadow-lg transition-shadow">
+              <Card key={order.id} className="shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">Buyurtma #{order.id.slice(-4)}</CardTitle>
-                    <Badge className={`${getStatusColor(order.status)} text-white`}>
+                    <Badge className={`${getStatusColor(order.status)} text-white font-semibold`}>
                       {getStatusText(order.status)}
                     </Badge>
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-muted-foreground mt-2">
                     <p>Stol: {tables.find((t) => t.id === order.tableId)?.name}</p>
                     <p>Ofitsiant: {order.waiterName}</p>
-                    <div className="flex items-center gap-1 mt-1">
-                      <Clock className="w-3 h-3" />
+                    <div className="flex items-center gap-1 mt-1 text-xs">
+                      <Clock className="w-3 h-3 text-muted-foreground" />
                       <span>
                         {order.createdAt.toLocaleTimeString("uz-UZ", {
                           hour: "2-digit",
@@ -476,18 +440,20 @@ export function OrderManagement({
                 <CardContent>
                   <div className="space-y-2">
                     <div className="text-sm">
-                      <p className="font-medium">Buyurtma tarkibi:</p>
-                      {order.items.slice(0, 3).map((item) => (
-                        <p key={item.menuItemId} className="text-gray-600">
-                          {item.quantity}x {item.name}
-                        </p>
-                      ))}
+                      <p className="font-medium mb-1">Buyurtma tarkibi:</p>
+                      <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                        {order.items.slice(0, 3).map((item) => (
+                          <li key={item.menuItemId}>
+                            {item.quantity}x {item.name}
+                          </li>
+                        ))}
+                      </ul>
                       {order.items.length > 3 && (
-                        <p className="text-gray-500">va yana {order.items.length - 3} ta...</p>
+                        <p className="text-muted-foreground text-xs mt-1">va yana {order.items.length - 3} ta...</p>
                       )}
                     </div>
 
-                    <div className="flex justify-between items-center font-semibold pt-2 border-t">
+                    <div className="flex justify-between items-center font-semibold text-lg pt-2 border-t mt-2">
                       <span>Jami:</span>
                       <span>{order.totalPrice.toLocaleString()} so'm</span>
                     </div>
@@ -509,11 +475,11 @@ export function OrderManagement({
       </div>
 
       <div>
-        <h3 className="text-lg font-medium mb-4">Tugallangan buyurtmalar</h3>
+        <h3 className="text-2xl font-bold mb-4">Tugallangan buyurtmalar</h3>
         {completedOrders.length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <p className="text-gray-500">Hozircha tugallangan buyurtmalar yo'q</p>
+          <Card className="shadow-sm">
+            <CardContent className="p-8 text-center text-muted-foreground">
+              <p>Hozircha tugallangan buyurtmalar yo'q</p>
             </CardContent>
           </Card>
         ) : (
@@ -522,12 +488,12 @@ export function OrderManagement({
               .slice(-5)
               .reverse()
               .map((order) => (
-                <Card key={order.id}>
+                <Card key={order.id} className="shadow-sm">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">Buyurtma #{order.id.slice(-4)}</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           Stol: {tables.find((t) => t.id === order.tableId)?.name} • Tugallangan:{" "}
                           {order.completedAt?.toLocaleTimeString("uz-UZ", {
                             hour: "2-digit",
@@ -536,7 +502,7 @@ export function OrderManagement({
                         </p>
                       </div>
                       <div className="text-right">
-                        <Badge className={`${getStatusColor(order.status)} text-white mb-1`}>
+                        <Badge className={`${getStatusColor(order.status)} text-white font-semibold mb-1`}>
                           {getStatusText(order.status)}
                         </Badge>
                         <p className="font-semibold">{order.totalPrice.toLocaleString()} so'm</p>

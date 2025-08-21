@@ -17,40 +17,7 @@ import {
   AlertTriangle,
   Download,
 } from "lucide-react"
-
-interface MenuItem {
-  id: string
-  name: string
-  category: "Taomlar" | "Salatlar" | "Ichimliklar"
-  price: number
-  stock: number
-  description?: string
-  isActive: boolean
-}
-
-interface Order {
-  id: string
-  tableId: string
-  items: { menuItemId: string; quantity: number; price: number; name: string }[]
-  totalPrice: number
-  status: "active" | "completed" | "cancelled"
-  createdAt: Date
-  completedAt?: Date
-  waiterName?: string
-}
-
-interface Table {
-  id: string
-  name: string
-  status: "Bo'sh" | "Band" | "Tozalanmoqda" | "Rezerv"
-  orders: string[]
-  totalAmount: number
-  capacity: number
-  assignedWaiter?: string
-  occupiedSince?: Date
-  reservedBy?: string
-  reservedTime?: Date
-}
+import { MenuItem, Order, Table } from "@/types"
 
 interface AdminDashboardProps {
   orders: Order[]
@@ -186,10 +153,10 @@ export function AdminDashboard({ orders, tables, menu }: AdminDashboardProps) {
   return (
     <div className="space-y-6">
       {/* Header with controls */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 rounded-lg bg-card shadow-sm">
         <div>
           <h2 className="text-2xl font-bold">Admin Dashboard</h2>
-          <p className="text-gray-600">Restoran faoliyati haqida umumiy ma'lumot</p>
+          <p className="text-muted-foreground">Restoran faoliyati haqida umumiy ma'lumot</p>
         </div>
         <div className="flex gap-2">
           <Select value={timeRange} onValueChange={setTimeRange}>
@@ -212,66 +179,66 @@ export function AdminDashboard({ orders, tables, menu }: AdminDashboardProps) {
 
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
+        <Card className="hover:shadow-md transition-shadow">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Bugungi daromad</p>
-                <p className="text-2xl font-bold text-green-600">{metrics.totalRevenue.toLocaleString()} so'm</p>
-                <div className="flex items-center gap-1 mt-1">
+                <p className="text-sm font-medium text-muted-foreground">Bugungi daromad</p>
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">{metrics.totalRevenue.toLocaleString()} so'm</p>
+                <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
                   <TrendingUp className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-green-600">+12.5%</span>
+                  <span className="text-green-600 dark:text-green-400">+12.5%</span>
                 </div>
               </div>
-              <DollarSign className="w-8 h-8 text-green-500" />
+              <DollarSign className="w-8 h-8 text-green-500 dark:text-green-400" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hover:shadow-md transition-shadow">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Jami buyurtmalar</p>
+                <p className="text-sm font-medium text-muted-foreground">Jami buyurtmalar</p>
                 <p className="text-2xl font-bold">{metrics.totalOrders}</p>
-                <div className="flex items-center gap-1 mt-1">
+                <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
                   <TrendingUp className="w-4 h-4 text-blue-500" />
-                  <span className="text-sm text-blue-600">+8.2%</span>
+                  <span className="text-blue-600 dark:text-blue-400">+8.2%</span>
                 </div>
               </div>
-              <ShoppingCart className="w-8 h-8 text-blue-500" />
+              <ShoppingCart className="w-8 h-8 text-blue-500 dark:text-blue-400" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hover:shadow-md transition-shadow">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">O'rtacha buyurtma</p>
+                <p className="text-sm font-medium text-muted-foreground">O'rtacha buyurtma</p>
                 <p className="text-2xl font-bold">{metrics.averageOrderValue.toLocaleString()} so'm</p>
-                <div className="flex items-center gap-1 mt-1">
+                <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
                   <TrendingDown className="w-4 h-4 text-red-500" />
-                  <span className="text-sm text-red-600">-2.1%</span>
+                  <span className="text-red-600 dark:text-red-400">-2.1%</span>
                 </div>
               </div>
-              <Users className="w-8 h-8 text-purple-500" />
+              <Users className="w-8 h-8 text-purple-500 dark:text-purple-400" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hover:shadow-md transition-shadow">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Stollar bandligi</p>
+                <p className="text-sm font-medium text-muted-foreground">Stollar bandligi</p>
                 <p className="text-2xl font-bold">{metrics.tableUtilization.toFixed(1)}%</p>
-                <div className="flex items-center gap-1 mt-1">
+                <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
                   <Clock className="w-4 h-4 text-orange-500" />
-                  <span className="text-sm text-orange-600">Real vaqt</span>
+                  <span className="text-orange-600 dark:text-orange-400">Real vaqt</span>
                 </div>
               </div>
-              <Package className="w-8 h-8 text-orange-500" />
+              <Package className="w-8 h-8 text-orange-500 dark:text-orange-400" />
             </div>
           </CardContent>
         </Card>
@@ -281,28 +248,24 @@ export function AdminDashboard({ orders, tables, menu }: AdminDashboardProps) {
       {(metrics.lowStockItems > 0 || metrics.outOfStockItems > 0) && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {metrics.lowStockItems > 0 && (
-            <Card className="border-yellow-200 bg-yellow-50">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-yellow-600" />
-                  <div>
-                    <p className="font-medium text-yellow-800">Kam qolgan mahsulotlar</p>
-                    <p className="text-sm text-yellow-700">{metrics.lowStockItems} ta mahsulot kam qolgan</p>
-                  </div>
+            <Card className="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-700">
+              <CardContent className="p-4 flex items-center gap-4">
+                <AlertTriangle className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+                <div>
+                  <p className="font-medium text-yellow-800 dark:text-yellow-200">Kam qolgan mahsulotlar</p>
+                  <p className="text-sm text-yellow-700 dark:text-yellow-300">{metrics.lowStockItems} ta mahsulot kam qolgan</p>
                 </div>
               </CardContent>
             </Card>
           )}
 
           {metrics.outOfStockItems > 0 && (
-            <Card className="border-red-200 bg-red-50">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <Package className="w-5 h-5 text-red-600" />
-                  <div>
-                    <p className="font-medium text-red-800">Tugab qolgan mahsulotlar</p>
-                    <p className="text-sm text-red-700">{metrics.outOfStockItems} ta mahsulot tugab qolgan</p>
-                  </div>
+            <Card className="border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20 dark:border-red-700">
+              <CardContent className="p-4 flex items-center gap-4">
+                <Package className="w-6 h-6 text-red-600 dark:text-red-400" />
+                <div>
+                  <p className="font-medium text-red-800 dark:text-red-200">Tugab qolgan mahsulotlar</p>
+                  <p className="text-sm text-red-700 dark:text-red-300">{metrics.outOfStockItems} ta mahsulot tugab qolgan</p>
                 </div>
               </CardContent>
             </Card>
@@ -312,14 +275,14 @@ export function AdminDashboard({ orders, tables, menu }: AdminDashboardProps) {
 
       {/* Charts and Analytics */}
       <Tabs defaultValue="sales" className="w-full">
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-4 h-auto p-1 bg-muted rounded-md">
           <TabsTrigger value="sales">Sotuv tahlili</TabsTrigger>
           <TabsTrigger value="menu">Menyu tahlili</TabsTrigger>
           <TabsTrigger value="tables">Stollar tahlili</TabsTrigger>
           <TabsTrigger value="performance">Ishlash ko'rsatkichlari</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="sales" className="space-y-6">
+        <TabsContent value="sales" className="space-y-6 mt-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Sales by Category */}
             <Card>
@@ -332,7 +295,7 @@ export function AdminDashboard({ orders, tables, menu }: AdminDashboardProps) {
                     const total = salesByCategory.reduce((sum, cat) => sum + cat.revenue, 0)
                     const percentage = total > 0 ? (category.revenue / total) * 100 : 0
                     return (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg bg-background hover:bg-muted/50 transition-colors">
                         <div className="flex items-center gap-3">
                           <div
                             className="w-4 h-4 rounded-full"
@@ -342,7 +305,7 @@ export function AdminDashboard({ orders, tables, menu }: AdminDashboardProps) {
                         </div>
                         <div className="text-right">
                           <p className="font-semibold">{category.revenue.toLocaleString()} so'm</p>
-                          <p className="text-sm text-gray-600">{percentage.toFixed(1)}%</p>
+                          <p className="text-sm text-muted-foreground">{percentage.toFixed(1)}%</p>
                         </div>
                       </div>
                     )
@@ -361,11 +324,11 @@ export function AdminDashboard({ orders, tables, menu }: AdminDashboardProps) {
                   {hourlySales
                     .filter((_, index) => index % 2 === 0)
                     .map((hour, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                      <div key={index} className="flex items-center justify-between p-2 border rounded bg-background hover:bg-muted/50 transition-colors">
                         <span className="text-sm font-medium">{hour.hour}</span>
                         <div className="text-right">
                           <p className="text-sm font-semibold">{hour.sales.toLocaleString()} so'm</p>
-                          <p className="text-xs text-gray-600">{hour.orders} buyurtma</p>
+                          <p className="text-xs text-muted-foreground">{hour.orders} buyurtma</p>
                         </div>
                       </div>
                     ))}
@@ -381,24 +344,24 @@ export function AdminDashboard({ orders, tables, menu }: AdminDashboardProps) {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <p className="text-2xl font-bold text-green-600">{metrics.completedOrders}</p>
-                  <p className="text-sm text-green-700">Tugallangan</p>
+                <div className="text-center p-4 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
+                  <p className="text-3xl font-bold">{metrics.completedOrders}</p>
+                  <p className="text-sm">Tugallangan</p>
                 </div>
-                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <p className="text-2xl font-bold text-blue-600">{metrics.activeOrders}</p>
-                  <p className="text-sm text-blue-700">Faol</p>
+                <div className="text-center p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300">
+                  <p className="text-3xl font-bold">{metrics.activeOrders}</p>
+                  <p className="text-sm">Faol</p>
                 </div>
-                <div className="text-center p-4 bg-red-50 rounded-lg">
-                  <p className="text-2xl font-bold text-red-600">{metrics.cancelledOrders}</p>
-                  <p className="text-sm text-red-700">Bekor qilingan</p>
+                <div className="text-center p-4 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
+                  <p className="text-3xl font-bold">{metrics.cancelledOrders}</p>
+                  <p className="text-sm">Bekor qilingan</p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="menu" className="space-y-6">
+        <TabsContent value="menu" className="space-y-6 mt-4">
           {/* Popular Items */}
           <Card>
             <CardHeader>
@@ -407,14 +370,14 @@ export function AdminDashboard({ orders, tables, menu }: AdminDashboardProps) {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {popularItems.slice(0, 8).map((item, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg bg-background hover:bg-muted/50 transition-colors">
                     <div>
                       <p className="font-medium">{item.name}</p>
-                      <p className="text-sm text-gray-600">#{index + 1} eng mashhur</p>
+                      <p className="text-sm text-muted-foreground">#{index + 1} eng mashhur</p>
                     </div>
                     <div className="text-right">
                       <p className="font-semibold">{item.quantity} dona</p>
-                      <p className="text-sm text-gray-600">{item.revenue.toLocaleString()} so'm</p>
+                      <p className="text-sm text-muted-foreground">{item.revenue.toLocaleString()} so'm</p>
                     </div>
                   </div>
                 ))}
@@ -429,28 +392,28 @@ export function AdminDashboard({ orders, tables, menu }: AdminDashboardProps) {
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full text-sm border-collapse">
                   <thead>
-                    <tr className="border-b">
-                      <th className="text-left p-2">Mahsulot</th>
-                      <th className="text-left p-2">Kategoriya</th>
-                      <th className="text-right p-2">Sotilgan</th>
-                      <th className="text-right p-2">Daromad</th>
-                      <th className="text-right p-2">Zaxira</th>
-                      <th className="text-center p-2">Holat</th>
+                    <tr className="border-b border-border text-muted-foreground">
+                      <th className="text-left p-3 font-medium">Mahsulot</th>
+                      <th className="text-left p-3 font-medium">Kategoriya</th>
+                      <th className="text-right p-3 font-medium">Sotilgan</th>
+                      <th className="text-right p-3 font-medium">Daromad</th>
+                      <th className="text-right p-3 font-medium">Zaxira</th>
+                      <th className="text-center p-3 font-medium">Holat</th>
                     </tr>
                   </thead>
                   <tbody>
                     {popularItems.slice(0, 10).map((item, index) => {
                       const menuItem = menu.find((m) => m.name === item.name)
                       return (
-                        <tr key={index} className="border-b">
-                          <td className="p-2 font-medium">{item.name}</td>
-                          <td className="p-2">{menuItem?.category}</td>
-                          <td className="p-2 text-right">{item.quantity}</td>
-                          <td className="p-2 text-right">{item.revenue.toLocaleString()} so'm</td>
-                          <td className="p-2 text-right">{menuItem?.stock}</td>
-                          <td className="p-2 text-center">
+                        <tr key={index} className="border-b border-border/50 hover:bg-muted/50 transition-colors">
+                          <td className="p-3 font-medium">{item.name}</td>
+                          <td className="p-3 text-muted-foreground">{menuItem?.category}</td>
+                          <td className="p-3 text-right">{item.quantity}</td>
+                          <td className="p-3 text-right">{item.revenue.toLocaleString()} so'm</td>
+                          <td className="p-3 text-right">{menuItem?.stock}</td>
+                          <td className="p-3 text-center">
                             {menuItem?.stock === 0 ? (
                               <Badge variant="destructive">Tugagan</Badge>
                             ) : menuItem?.stock && menuItem.stock <= 10 ? (
@@ -469,7 +432,7 @@ export function AdminDashboard({ orders, tables, menu }: AdminDashboardProps) {
           </Card>
         </TabsContent>
 
-        <TabsContent value="tables" className="space-y-6">
+        <TabsContent value="tables" className="space-y-6 mt-4">
           {/* Table Performance */}
           <Card>
             <CardHeader>
@@ -478,22 +441,22 @@ export function AdminDashboard({ orders, tables, menu }: AdminDashboardProps) {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {tablePerformance.map((table, index) => (
-                  <div key={index} className="p-4 bg-gray-50 rounded-lg">
+                  <div key={index} className="p-4 border rounded-lg bg-background hover:bg-muted/50 transition-colors">
                     <h3 className="font-semibold text-lg">{table.name}</h3>
                     <div className="mt-2 space-y-1">
-                      <p className="text-sm">
-                        Buyurtmalar: <span className="font-medium">{table.orders}</span>
+                      <p className="text-sm text-muted-foreground">
+                        Buyurtmalar: <span className="font-medium text-foreground">{table.orders}</span>
                       </p>
-                      <p className="text-sm">
-                        Daromad: <span className="font-medium">{table.revenue.toLocaleString()} so'm</span>
+                      <p className="text-sm text-muted-foreground">
+                        Daromad: <span className="font-medium text-foreground">{table.revenue.toLocaleString()} so'm</span>
                       </p>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                      <div className="w-full bg-muted rounded-full h-2 mt-2">
                         <div
-                          className="bg-blue-500 h-2 rounded-full"
+                          className="bg-primary h-2 rounded-full"
                           style={{ width: `${Math.min(table.utilization, 100)}%` }}
                         />
                       </div>
-                      <p className="text-xs text-gray-600">Bandlik: {table.utilization}%</p>
+                      <p className="text-xs text-muted-foreground">Bandlik: {table.utilization}%</p>
                     </div>
                   </div>
                 ))}
@@ -504,31 +467,42 @@ export function AdminDashboard({ orders, tables, menu }: AdminDashboardProps) {
           {/* Table Status Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {tables.map((table) => (
-              <Card key={table.id} className="text-center">
+              <Card key={table.id} className="text-center border hover:shadow-md transition-shadow">
                 <CardContent className="p-4">
-                  <h3 className="font-semibold">{table.name}</h3>
+                  <h3 className="font-semibold mb-2">{table.name}</h3>
                   <Badge
-                    className={`mt-2 ${
+                    className={`${
                       table.status === "Bo'sh"
-                        ? "bg-green-500"
+                        ? "bg-green-500 dark:bg-green-600"
                         : table.status === "Band"
-                          ? "bg-red-500"
+                          ? "bg-red-500 dark:bg-red-600"
                           : table.status === "Rezerv"
-                            ? "bg-blue-500"
-                            : "bg-yellow-500"
-                    } text-white`}
+                            ? "bg-blue-500 dark:bg-blue-600"
+                            : "bg-yellow-500 dark:bg-yellow-600"
+                    } text-white hover:bg-opacity-80`}
                   >
                     {table.status}
                   </Badge>
-                  <p className="text-sm text-gray-600 mt-2">Sig'im: {table.capacity}</p>
+                  <p className="text-sm text-muted-foreground mt-2">Sig'im: {table.capacity}</p>
                   <p className="text-sm font-medium">{table.totalAmount.toLocaleString()} so'm</p>
+                  <div className="flex flex-col gap-2 mt-4">
+                    <Button size="sm" variant="outline" onClick={() => updateTableStatus(table.id, "Band")} className="w-full">
+                      Band
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => updateTableStatus(table.id, "Bo'sh")} className="w-full">
+                      Bo'sh
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => updateTableStatus(table.id, "Tozalanmoqda")} className="w-full">
+                      Tozalash
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         </TabsContent>
 
-        <TabsContent value="performance" className="space-y-6">
+        <TabsContent value="performance" className="space-y-6 mt-4">
           {/* Performance Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card>
@@ -537,8 +511,8 @@ export function AdminDashboard({ orders, tables, menu }: AdminDashboardProps) {
               </CardHeader>
               <CardContent>
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-blue-600">8.5</p>
-                  <p className="text-sm text-gray-600">daqiqa (o'rtacha)</p>
+                  <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">8.5</p>
+                  <p className="text-sm text-muted-foreground">daqiqa (o'rtacha)</p>
                 </div>
               </CardContent>
             </Card>
@@ -549,8 +523,8 @@ export function AdminDashboard({ orders, tables, menu }: AdminDashboardProps) {
               </CardHeader>
               <CardContent>
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-green-600">4.7</p>
-                  <p className="text-sm text-gray-600">5 dan (o'rtacha reyting)</p>
+                  <p className="text-4xl font-bold text-green-600 dark:text-green-400">4.7</p>
+                  <p className="text-sm text-muted-foreground">5 dan (o'rtacha reyting)</p>
                 </div>
               </CardContent>
             </Card>
@@ -561,8 +535,8 @@ export function AdminDashboard({ orders, tables, menu }: AdminDashboardProps) {
               </CardHeader>
               <CardContent>
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-purple-600">92%</p>
-                  <p className="text-sm text-gray-600">Umumiy samaradorlik</p>
+                  <p className="text-4xl font-bold text-purple-600 dark:text-purple-400">92%</p>
+                  <p className="text-sm text-muted-foreground">Umumiy samaradorlik</p>
                 </div>
               </CardContent>
             </Card>
@@ -580,16 +554,16 @@ export function AdminDashboard({ orders, tables, menu }: AdminDashboardProps) {
                   .slice(-10)
                   .reverse()
                   .map((order) => (
-                    <div key={order.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div key={order.id} className="flex items-center justify-between p-3 border rounded-lg bg-background hover:bg-muted/50 transition-colors">
                       <div>
                         <p className="font-medium">Buyurtma #{order.id.slice(-4)}</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           {tables.find((t) => t.id === order.tableId)?.name} • {order.waiterName}
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="font-semibold">{order.totalPrice.toLocaleString()} so'm</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           {order.completedAt?.toLocaleTimeString("uz-UZ", {
                             hour: "2-digit",
                             minute: "2-digit",
