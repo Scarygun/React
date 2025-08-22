@@ -78,8 +78,9 @@ export function LoginForm() {
               <p>
                 <strong>Ofitsiant:</strong> waiter1 / waiter123
               </p>
+              
               <p>
-                <strong>Menejer:</strong> manager / manager123
+                <strong>Oshpaz:</strong> chef.test / password
               </p>
             </div>
           </div>

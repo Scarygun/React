@@ -134,7 +134,7 @@ export function MenuManagement({ menu, setMenu, userRole }: MenuManagementProps)
   const lowStockItems = menu.filter((item) => item.stock <= 10 && item.stock > 0)
   const outOfStockItems = menu.filter((item) => item.stock === 0)
 
-  const canManageMenu = userRole === "admin" || userRole === "manager"
+  const canManageMenu = userRole === "admin"
 
   return (
     <div className="space-y-6">

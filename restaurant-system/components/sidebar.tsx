@@ -17,11 +17,12 @@ interface SidebarProps {
 
 export function Sidebar({ currentTab, onTabChange, userRole, user, logout }: SidebarProps) {
   const navItems = [
-    { value: "tables", label: "Stollar", icon: Table },
-    { value: "orders", label: "Buyurtmalar", icon: ClipboardList },
-    { value: "menu", label: "Menyu", icon: UtensilsCrossed },
-    { value: "reports", label: "Hisobotlar", icon: BarChart },
-    { value: "admin", label: "Admin", roles: ["admin", "manager"], icon: ShieldCheck },
+    { value: "tables", label: "Stollar", icon: Table, roles: ["admin", "waiter"] },
+    { value: "orders", label: "Buyurtmalar", icon: ClipboardList, roles: ["admin", "waiter"] },
+    { value: "menu", label: "Menyu", icon: UtensilsCrossed, roles: ["admin", "waiter"] },
+    { value: "reports", label: "Hisobotlar", icon: BarChart, roles: ["admin"] },
+    { value: "admin", label: "Admin", roles: ["admin"], icon: ShieldCheck },
+    { value: "chef", label: "Oshpaz", roles: ["chef", "admin"], icon: Utensils },
   ]
 
   return (
@@ -37,7 +38,7 @@ export function Sidebar({ currentTab, onTabChange, userRole, user, logout }: Sid
         </div>
       </div>
       {navItems.map((item) => {
-        if (item.roles && !(userRole && item.roles.includes(userRole))) {
+        if (item.roles && !item.roles.includes(userRole)) {
           return null
         }
         return (
@@ -53,16 +54,7 @@ export function Sidebar({ currentTab, onTabChange, userRole, user, logout }: Sid
         )
       })}
 
-      {(user?.role === "chef" || user?.role === "admin") && (
-        <Button
-          variant={currentTab === "chef" ? "secondary" : "ghost"}
-          onClick={() => onTabChange("chef")}
-          className="w-full justify-start"
-        >
-          <Utensils className="mr-2 h-4 w-4" />
-          Oshpaz
-        </Button>
-      )}
+      
     </nav>
   )
 } 

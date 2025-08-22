@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/contexts/auth-context"
@@ -92,9 +93,8 @@ export default function RestaurantManagement() {
   const [tables, setTables] = useState<Table[]>(initialTables)
   const [orders, setOrders] = useState<Order[]>([])
   const [menu, setMenu] = useState<MenuItem[]>(initialMenu)
-  const [selectedTable, setSelectedTable] = useState<string | null>(null)
-  const [currentTab, setCurrentTab] = useState("tables")
   const { user, logout, isAuthenticated } = useAuth()
+  const [currentTab, setCurrentTab] = useState(user?.role === "chef" ? "chef" : "tables")
 
   const { generateStockAlerts } = useBusinessLogic()
 
@@ -182,7 +182,12 @@ export default function RestaurantManagement() {
   }
 
   if (!isAuthenticated) {
-    return <LoginForm />
+    return (
+      <div className="min-h-screen flex items-center justify-center restaurant-bg">
+        <Image src="/placeholder-logo.png" alt="Logo" width={200} height={200} className="mr-10" />
+        <LoginForm />
+      </div>
+    )
   }
 
   return (
@@ -200,34 +205,40 @@ export default function RestaurantManagement() {
               <TableManagement tables={tables} setTables={setTables} userRole={user?.role || ""} />
             </TabsContent>
 
-            <TabsContent value="orders" className="space-y-4">
-              <OrderManagement
-                orders={orders}
-                setOrders={setOrders}
-                tables={tables}
-                setTables={setTables}
-                menu={menu}
-                setMenu={setMenu}
-                userRole={user?.role || ""}
-                userName={user?.name || ""}
-              />
-            </TabsContent>
+            {(user?.role === "admin" || user?.role === "waiter") && (
+              <TabsContent value="orders" className="space-y-4">
+                <OrderManagement
+                  orders={orders}
+                  setOrders={setOrders}
+                  tables={tables}
+                  setTables={setTables}
+                  menu={menu}
+                  setMenu={setMenu}
+                  userRole={user?.role || ""}
+                  userName={user?.name || ""}
+                />
+              </TabsContent>
+            )}
 
-            <TabsContent value="menu" className="space-y-4">
-              <MenuManagement menu={menu} setMenu={setMenu} userRole={user?.role || ""} />
-            </TabsContent>
+            {(user?.role === "admin" || user?.role === "waiter") && (
+              <TabsContent value="menu" className="space-y-4">
+                <MenuManagement menu={menu} setMenu={setMenu} userRole={user?.role || ""} />
+              </TabsContent>
+            )}
 
-            <TabsContent value="reports" className="space-y-4">
-              <ReportsManagement orders={orders} menu={menu} />
-            </TabsContent>
+            {(user?.role === "admin") && (
+              <TabsContent value="reports" className="space-y-4">
+                <ReportsManagement orders={orders} menu={menu} />
+              </TabsContent>
+            )}
 
-            {(user?.role === "admin" || user?.role === "manager") && (
+            {(user?.role === "admin") && (
               <TabsContent value="admin" className="space-y-4">
                 <AdminDashboard orders={orders} tables={tables} menu={menu} />
               </TabsContent>
             )}
 
-            {((user?.role === "chef" || user?.role === "admin") as UserRole) && (
+            {(user?.role === "chef" || user?.role === "admin") && (
               <TabsContent value="chef" className="space-y-4">
                 <ChefDashboard orders={orders} setOrders={setOrders} menu={menu} tables={tables} chefName={user?.name || ""} />
               </TabsContent>

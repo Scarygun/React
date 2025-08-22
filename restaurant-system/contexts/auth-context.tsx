@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 
-export type UserRole = "admin" | "waiter" | "manager"
+export type UserRole = "admin" | "waiter" | "chef"
 
 export interface User {
   id: string
@@ -25,11 +25,9 @@ const mockUsers: User[] = [
   { id: "1", username: "admin", role: "admin", name: "Administrator" },
   { id: "2", username: "waiter1", role: "waiter", name: "Ofitsiant 1" },
   { id: "3", username: "waiter2", role: "waiter", name: "Ofitsiant 2" },
-  { id: "4", username: "manager", role: "manager", name: "Menejer" },
   {
     id: "5",
     username: "chef.test",
-    password: "password",
     role: "chef",
     name: "Oshpazbek",
   },
@@ -39,7 +37,7 @@ const mockPasswords: Record<string, string> = {
   admin: "admin123",
   waiter1: "waiter123",
   waiter2: "waiter123",
-  manager: "manager123",
+  "chef.test": "password",
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
