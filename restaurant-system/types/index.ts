@@ -29,7 +29,7 @@ export interface Order {
   tableId: string
   items: OrderItem[]
   totalPrice: number
-  status: "active" | "completed" | "cancelled"
+  status: "active" | "in-progress" | "completed" | "cancelled"
   createdAt: Date
   completedAt?: Date
   waiterName?: string

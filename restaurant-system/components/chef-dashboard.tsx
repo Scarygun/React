@@ -13,6 +13,7 @@ interface ChefDashboardProps {
   setOrders: React.Dispatch<React.SetStateAction<Order[]>>
   menu: MenuItem[]
   tables: Table[]
+  setTables: React.Dispatch<React.SetStateAction<Table[]>>
   chefName: string
 }
 
@@ -21,8 +22,8 @@ export function ChefDashboard({ orders, setOrders, menu, tables, chefName }: Che
 
   const newOrders = useMemo(() => orders.filter((order) => order.status === "active"), [orders])
   const inProgressOrders = useMemo(
-    () => orders.filter((order) => order.status === "active" && order.waiterName === chefName),
-    [orders, chefName],
+    () => orders.filter((order) => order.status === "in-progress"),
+    [orders],
   )
 
   // Daily statistics for the chef
@@ -35,17 +36,28 @@ export function ChefDashboard({ orders, setOrders, menu, tables, chefName }: Che
     )
 
     return {
-      accepted: chefOrdersToday.filter((order) => order.status === "active").length,
-      inProgress: chefOrdersToday.filter((order) => order.status === "active").length, // Assuming active are in progress for chef
+      accepted: chefOrdersToday.filter((order) => order.status === "in-progress").length,
+      inProgress: chefOrdersToday.filter((order) => order.status === "in-progress").length, 
       completed: chefOrdersToday.filter((order) => order.status === "completed").length,
       rework: 0, // Placeholder for future rework status
     }
   }, [orders, chefName])
 
-  const updateOrderStatus = (orderId: string, newStatus: Order["status"]) => {
+  const updateOrderStatus = (orderId: string, newStatus: Order["status"], tableId: string) => {
     setOrders((prev) =>
       prev.map((order) => (order.id === orderId ? { ...order, status: newStatus } : order)),
     )
+
+    if (newStatus === "completed") {
+      // Remove the completed order from the table's active orders list
+      setTables((prevTables) =>
+        prevTables.map((table) =>
+          table.id === tableId
+            ? { ...table, orders: table.orders.filter((id) => id !== orderId) }
+            : table,
+        ),
+      )
+    }
   }
 
   const getTableAndItemNames = (order: Order) => {
@@ -90,7 +102,7 @@ export function ChefDashboard({ orders, setOrders, menu, tables, chefName }: Che
                       </div>
                       <p className="text-muted-foreground mb-3">Buyurtma: {itemNames}</p>
                       <Button
-                        onClick={() => updateOrderStatus(order.id, "active")}
+                        onClick={() => updateOrderStatus(order.id, "in-progress", order.tableId)}
                         className="w-full flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white"
                       >
                         <Clock className="w-4 h-4" />
@@ -127,7 +139,7 @@ export function ChefDashboard({ orders, setOrders, menu, tables, chefName }: Che
                       </div>
                       <p className="text-muted-foreground mb-3">Buyurtma: {itemNames}</p>
                       <Button
-                        onClick={() => updateOrderStatus(order.id, "completed")}
+                        onClick={() => updateOrderStatus(order.id, "completed", order.tableId)}
                         className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white"
                       >
                         <CheckCircle className="w-4 h-4" />

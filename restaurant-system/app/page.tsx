@@ -17,6 +17,7 @@ import { Sidebar } from "@/components/sidebar"
 import { ChefDashboard } from "@/components/chef-dashboard"
 import { MenuItem, Order, Table } from "@/types"
 import { UserRole } from "@/types"
+import { ArrowLeft, History, Download, Upload, Plus, Utensils, ClipboardList, BarChart, Home } from "lucide-react"
 
 // Mock data
 const initialMenu: MenuItem[] = [
@@ -94,7 +95,7 @@ export default function RestaurantManagement() {
   const [orders, setOrders] = useState<Order[]>([])
   const [menu, setMenu] = useState<MenuItem[]>(initialMenu)
   const { user, logout, isAuthenticated } = useAuth()
-  const [currentTab, setCurrentTab] = useState(user?.role === "chef" ? "chef" : "tables")
+  const [currentTab, setCurrentTab] = useState(user?.role === "chef" ? "chef" : "dashboard")
 
   const { generateStockAlerts } = useBusinessLogic()
 
@@ -191,61 +192,223 @@ export default function RestaurantManagement() {
   }
 
   return (
-    <div className="p-4">
-      <div className="mx-auto rounded-lg shadow-xl p-6 bg-background/80 backdrop-blur-md">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl text-gray-900 dark:text-gray-50">Restoran Boshqaruv Tizimi</h1>
-          {/* Removed user info and logout button as they are now in the sidebar */}
+    <div className="flex h-full w-full">
+      <Sidebar currentTab={currentTab} onTabChange={setCurrentTab} userRole={user?.role || ""} user={user} logout={logout} />
+      <main className="flex-1 overflow-auto p-4 lg:p-6 bg-muted/40 rounded-tl-lg shadow-inner">
+
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-4">
+            {/* <Button variant="ghost" size="icon" className="lg:hidden">
+              <ArrowLeft className="h-5 w-5" />
+              <span className="sr-only">Orqaga</span>
+            </Button> */}
+            <h2 className="text-2xl font-bold">Navigatsiya va Boshqaruv</h2>
+          </div>
+          <div className="flex items-center space-x-4">
+            <p className="text-sm text-muted-foreground">Joriy: <span className="font-medium capitalize">{currentTab.replace('-', ' ')}</span></p>
+            <ThemeToggle />
+            {/* <div className="relative">
+              <Button variant="ghost" size="icon">
+                <History className="h-5 w-5" />
+                <span className="sr-only">More options</span>
+              </Button>
+              
+            </div>
+             */}
+          </div>
         </div>
 
-        <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full flex">
-          <Sidebar currentTab={currentTab} onTabChange={setCurrentTab} userRole={user?.role || ""} user={user} logout={logout} />
-          <div className="flex-1 ml-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+          <div className="p-4 bg-background rounded-lg shadow flex flex-col items-start">
+            <h3 className="text-lg font-semibold">Buyurtmalar Sanoqi</h3>
+            <div className="text-sm text-muted-foreground mt-2">
+              <p>Bugun: <span className="font-bold text-lg text-green-500">{getOrderCount().today}</span></p>
+              <p>Bu hafta: <span className="font-bold text-lg text-green-500">{getOrderCount().week}</span></p>
+              <p>Bu oy: <span className="font-bold text-lg text-green-500">{getOrderCount().month}</span></p>
+            </div>
+          </div>
+          {user?.role === "admin" && (
+            <div className="p-4 bg-background rounded-lg shadow flex flex-col items-start">
+              <h3 className="text-lg font-semibold">Ma'lumotlar Zaxirasi</h3>
+              <div className="flex space-x-2 mt-2">
+                <Button onClick={handleBackupData} className="flex items-center">
+                  <Download className="mr-2 h-4 w-4" /> Zaxiralash
+                </Button>
+                <Button onClick={() => document.getElementById('restore-file-input')?.click()} className="flex items-center">
+                  <Upload className="mr-2 h-4 w-4" /> Tiklash
+                </Button>
+                <input
+                  id="restore-file-input"
+                  type="file"
+                  accept=".json"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      const reader = new FileReader()
+                      reader.onload = (event) => {
+                        try {
+                          const data = JSON.parse(event.target?.result as string)
+                          handleRestoreData(data)
+                        } catch (error) {
+                          console.error("Faylni o'qishda xatolik: ", error)
+                          alert("Noto'g'ri fayl formati!")
+                        }
+                      }
+                      reader.readAsText(file)
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          )}
+          <div className="p-4 bg-background rounded-lg shadow flex flex-col items-start">
+            <h3 className="text-lg font-semibold">Tezkor Harakatlar</h3>
+            <div className="grid grid-cols-2 gap-2 mt-2 w-full">
+              <Button variant="outline">Yangi Buyurtma</Button>
+              <Button variant="outline">Hisobotlar</Button>
+            </div>
+          </div>
+        </div>
+
+        <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full flex-1">
+          <TabsContent value="dashboard" className="space-y-4">
+            <h2 className="text-3xl font-bold mb-6">Dashboard</h2>
+            <p className="text-muted-foreground mb-6">Umumiy ko'rinish va statistika</p>
+
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+              <div className="p-4 bg-background rounded-lg shadow">
+                <h3 className="text-lg font-semibold">Jami Stollar</h3>
+                <p className="text-3xl font-bold mt-2">{tables.length}</p>
+                <p className="text-sm text-muted-foreground">{tables.filter(table => table.status === "Band").length} band, {tables.filter(table => table.status === "Bo'sh").length} bo'sh</p>
+              </div>
+              <div className="p-4 bg-background rounded-lg shadow">
+                <h3 className="text-lg font-semibold">Faol Buyurtmalar</h3>
+                <p className="text-3xl font-bold mt-2">{orders.filter(order => order.status !== "completed").length}</p>
+                <p className="text-sm text-muted-foreground">{orders.filter(order => order.status === "completed").length} tugallangan</p>
+              </div>
+              <div className="p-4 bg-background rounded-lg shadow">
+                <h3 className="text-lg font-semibold">Bugungi Daromad</h3>
+                <p className="text-3xl font-bold mt-2">{orders.filter(order => new Date(order.createdAt).toDateString() === new Date().toDateString()).reduce((sum, order) => sum + order.totalPrice, 0).toLocaleString()} so'm</p>
+                <p className="text-sm text-muted-foreground">Jami: {orders.reduce((sum, order) => sum + order.totalPrice, 0).toLocaleString()} so'm</p>
+              </div>
+              <div className="p-4 bg-background rounded-lg shadow">
+                <h3 className="text-lg font-semibold">Band Stollar</h3>
+                <p className="text-3xl font-bold mt-2">{((tables.filter(table => table.status === "Band").length / tables.length) * 100 || 0).toFixed(0)}%</p>
+                <p className="text-sm text-muted-foreground">{tables.filter(table => table.status === "Band").length} / {tables.length}</p>
+              </div>
+            </div>
+
+            <h2 className="text-2xl font-bold mb-4">Tezkor Amallar</h2>
+            <p className="text-muted-foreground mb-6">Asosiy funksiyalarga tezkor kirish</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <Button onClick={() => setCurrentTab("orders")} className="h-24 flex flex-col items-center justify-center text-lg">
+                <Plus className="h-6 w-6 mb-2" />
+                Yangi Buyurtma
+              </Button>
+              <Button onClick={() => setCurrentTab("tables")} variant="outline" className="h-24 flex flex-col items-center justify-center text-lg">
+                <Home className="h-6 w-6 mb-2" />
+                Stollar
+              </Button>
+              <Button onClick={() => setCurrentTab("menu")} variant="outline" className="h-24 flex flex-col items-center justify-center text-lg">
+                <Utensils className="h-6 w-6 mb-2" />
+                Menyu
+              </Button>
+              <Button onClick={() => setCurrentTab("reports")} variant="outline" className="h-24 flex flex-col items-center justify-center text-lg">
+                <BarChart className="h-6 w-6 mb-2" />
+                Hisobotlar
+              </Button>
+            </div>
+
+            <h2 className="text-2xl font-bold mb-4">Stollar Holati</h2>
+            <p className="text-muted-foreground mb-6">Real vaqt stollar holati</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-6">
+              {tables.map((table) => (
+                <div key={table.id} className="p-4 bg-background rounded-lg shadow flex flex-col items-center justify-center">
+                  <p className="font-semibold text-lg">{table.name}</p>
+                  <p className={`text-sm ${table.status === "Bo'sh" ? "text-green-500" : "text-red-500"}`}>{table.status}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex space-x-4 mb-6">
+              <div className="flex items-center space-x-1">
+                <span className="h-3 w-3 rounded-full bg-green-500"></span>
+                <span className="text-sm text-muted-foreground">Bo'sh ({tables.filter(table => table.status === "Bo'sh").length})</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <span className="h-3 w-3 rounded-full bg-red-500"></span>
+                <span className="text-sm text-muted-foreground">Band ({tables.filter(table => table.status === "Band").length})</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <span className="h-3 w-3 rounded-full bg-blue-500"></span>
+                <span className="text-sm text-muted-foreground">Rezerv ({tables.filter(table => table.status === "Rezerv").length})</span>
+              </div>
+            </div>
+
+            <h2 className="text-2xl font-bold mb-4">So'nggi Buyurtmalar</h2>
+            <p className="text-muted-foreground mb-6">Eng yangi 5 ta buyurtma</p>
+            <div className="p-4 bg-background rounded-lg shadow">
+              {orders.length === 0 ? (
+                <p className="text-muted-foreground">Hozircha buyurtmalar yo'q</p>
+              ) : (
+                <ul className="space-y-2">
+                  {orders.slice(0, 5).map((order) => (
+                    <li key={order.id} className="flex items-center justify-between">
+                      <span>Buyurtma #{order.id} - {order.totalPrice.toLocaleString()} so'm</span>
+                      <span className="text-sm text-muted-foreground">{new Date(order.createdAt).toLocaleDateString()}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </TabsContent>
+
+          {(user?.role === "admin" || user?.role === "waiter") && (
             <TabsContent value="tables" className="space-y-4">
               <TableManagement tables={tables} setTables={setTables} userRole={user?.role || ""} />
             </TabsContent>
+          )}
 
-            {(user?.role === "admin" || user?.role === "waiter") && (
-              <TabsContent value="orders" className="space-y-4">
-                <OrderManagement
-                  orders={orders}
-                  setOrders={setOrders}
-                  tables={tables}
-                  setTables={setTables}
-                  menu={menu}
-                  setMenu={setMenu}
-                  userRole={user?.role || ""}
-                  userName={user?.name || ""}
-                />
-              </TabsContent>
-            )}
+          {(user?.role === "admin" || user?.role === "waiter") && (
+            <TabsContent value="orders" className="space-y-4">
+              <OrderManagement
+                orders={orders}
+                setOrders={setOrders}
+                tables={tables}
+                setTables={setTables}
+                menu={menu}
+                setMenu={setMenu}
+                userRole={user?.role || ""}
+                userName={user?.name || ""}
+              />
+            </TabsContent>
+          )}
 
-            {(user?.role === "admin" || user?.role === "waiter") && (
-              <TabsContent value="menu" className="space-y-4">
-                <MenuManagement menu={menu} setMenu={setMenu} userRole={user?.role || ""} />
-              </TabsContent>
-            )}
+          {(user?.role === "admin" || user?.role === "waiter") && (
+            <TabsContent value="menu" className="space-y-4">
+              <MenuManagement menu={menu} setMenu={setMenu} userRole={user?.role || ""} />
+            </TabsContent>
+          )}
 
-            {(user?.role === "admin") && (
-              <TabsContent value="reports" className="space-y-4">
-                <ReportsManagement orders={orders} menu={menu} />
-              </TabsContent>
-            )}
+          {(user?.role === "admin") && (
+            <TabsContent value="reports" className="space-y-4">
+              <ReportsManagement orders={orders} menu={menu} />
+            </TabsContent>
+          )}
 
-            {(user?.role === "admin") && (
-              <TabsContent value="admin" className="space-y-4">
-                <AdminDashboard orders={orders} tables={tables} menu={menu} />
-              </TabsContent>
-            )}
+          {(user?.role === "admin") && (
+            <TabsContent value="admin" className="space-y-4">
+              <AdminDashboard orders={orders} tables={tables} menu={menu} />
+            </TabsContent>
+          )}
 
-            {(user?.role === "chef" || user?.role === "admin") && (
-              <TabsContent value="chef" className="space-y-4">
-                <ChefDashboard orders={orders} setOrders={setOrders} menu={menu} tables={tables} chefName={user?.name || ""} />
-              </TabsContent>
-            )}
-          </div>
+          {(user?.role === "chef" || user?.role === "admin") && (
+            <TabsContent value="chef" className="space-y-4">
+              <ChefDashboard orders={orders} setOrders={setOrders} menu={menu} tables={tables} setTables={setTables} chefName={user?.name || ""} />
+            </TabsContent>
+          )}
         </Tabs>
-      </div>
+      </main>
     </div>
   )
 }
