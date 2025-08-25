@@ -202,7 +202,6 @@ export default function RestaurantManagement() {
               <ArrowLeft className="h-5 w-5" />
               <span className="sr-only">Orqaga</span>
             </Button> */}
-            <h2 className="text-2xl font-bold">Navigatsiya va Boshqaruv</h2>
           </div>
           <div className="flex items-center space-x-4">
             <p className="text-sm text-muted-foreground">Joriy: <span className="font-medium capitalize">{currentTab.replace('-', ' ')}</span></p>
@@ -215,59 +214,6 @@ export default function RestaurantManagement() {
               
             </div>
              */}
-          </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
-          <div className="p-4 bg-background rounded-lg shadow flex flex-col items-start">
-            <h3 className="text-lg font-semibold">Buyurtmalar Sanoqi</h3>
-            <div className="text-sm text-muted-foreground mt-2">
-              <p>Bugun: <span className="font-bold text-lg text-green-500">{getOrderCount().today}</span></p>
-              <p>Bu hafta: <span className="font-bold text-lg text-green-500">{getOrderCount().week}</span></p>
-              <p>Bu oy: <span className="font-bold text-lg text-green-500">{getOrderCount().month}</span></p>
-            </div>
-          </div>
-          {user?.role === "admin" && (
-            <div className="p-4 bg-background rounded-lg shadow flex flex-col items-start">
-              <h3 className="text-lg font-semibold">Ma'lumotlar Zaxirasi</h3>
-              <div className="flex space-x-2 mt-2">
-                <Button onClick={handleBackupData} className="flex items-center">
-                  <Download className="mr-2 h-4 w-4" /> Zaxiralash
-                </Button>
-                <Button onClick={() => document.getElementById('restore-file-input')?.click()} className="flex items-center">
-                  <Upload className="mr-2 h-4 w-4" /> Tiklash
-                </Button>
-                <input
-                  id="restore-file-input"
-                  type="file"
-                  accept=".json"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0]
-                    if (file) {
-                      const reader = new FileReader()
-                      reader.onload = (event) => {
-                        try {
-                          const data = JSON.parse(event.target?.result as string)
-                          handleRestoreData(data)
-                        } catch (error) {
-                          console.error("Faylni o'qishda xatolik: ", error)
-                          alert("Noto'g'ri fayl formati!")
-                        }
-                      }
-                      reader.readAsText(file)
-                    }
-                  }}
-                />
-              </div>
-            </div>
-          )}
-          <div className="p-4 bg-background rounded-lg shadow flex flex-col items-start">
-            <h3 className="text-lg font-semibold">Tezkor Harakatlar</h3>
-            <div className="grid grid-cols-2 gap-2 mt-2 w-full">
-              <Button variant="outline">Yangi Buyurtma</Button>
-              <Button variant="outline">Hisobotlar</Button>
-            </div>
           </div>
         </div>
 
@@ -297,27 +243,6 @@ export default function RestaurantManagement() {
                 <p className="text-3xl font-bold mt-2">{((tables.filter(table => table.status === "Band").length / tables.length) * 100 || 0).toFixed(0)}%</p>
                 <p className="text-sm text-muted-foreground">{tables.filter(table => table.status === "Band").length} / {tables.length}</p>
               </div>
-            </div>
-
-            <h2 className="text-2xl font-bold mb-4">Tezkor Amallar</h2>
-            <p className="text-muted-foreground mb-6">Asosiy funksiyalarga tezkor kirish</p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <Button onClick={() => setCurrentTab("orders")} className="h-24 flex flex-col items-center justify-center text-lg">
-                <Plus className="h-6 w-6 mb-2" />
-                Yangi Buyurtma
-              </Button>
-              <Button onClick={() => setCurrentTab("tables")} variant="outline" className="h-24 flex flex-col items-center justify-center text-lg">
-                <Home className="h-6 w-6 mb-2" />
-                Stollar
-              </Button>
-              <Button onClick={() => setCurrentTab("menu")} variant="outline" className="h-24 flex flex-col items-center justify-center text-lg">
-                <Utensils className="h-6 w-6 mb-2" />
-                Menyu
-              </Button>
-              <Button onClick={() => setCurrentTab("reports")} variant="outline" className="h-24 flex flex-col items-center justify-center text-lg">
-                <BarChart className="h-6 w-6 mb-2" />
-                Hisobotlar
-              </Button>
             </div>
 
             <h2 className="text-2xl font-bold mb-4">Stollar Holati</h2>
